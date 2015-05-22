@@ -1,0 +1,12 @@
+{
+  "wskey": {
+    "public": "",
+    "secret": ""
+  },
+  "user": {
+    "principalID": "",
+    "principalIDNS": ""
+  },
+  "agencyID": 0,
+  "shelvingLoc": 0
+}
