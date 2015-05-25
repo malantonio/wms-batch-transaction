@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 'use strict';
 
 var fs = require('fs')
@@ -96,7 +95,7 @@ fs.readFile(file, function(err, data) {
 function showHelp() {
   var name = path.basename(process.argv[1]);
   console.log('Batch check in/out items in WMS');
-  console.log('Usage: ./%s [opt] path/to/file.csv', name);
+  console.log('Usage: node %s [opt] path/to/file.csv', name);
   console.log('')
   console.log('OPTIONS');
   console.log('--check-in | --check-out | --debug   set mode');
