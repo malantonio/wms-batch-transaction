@@ -6,7 +6,7 @@ var fs = require('fs')
   , WSKey = require('oclc-wskey')
   , NCIP = require('oclc-ncip')
   , parse = require('csv-parse')
-  , argv = require('minimist')(process.argv.slice(2))
+  , argv = require('minimist')(process.argv.slice(2), {'boolean': true})
   ;
 
 var configPath = argv['config'] || path.join(__dirname, 'config.json');
