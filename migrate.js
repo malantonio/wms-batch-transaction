@@ -23,7 +23,6 @@ var key = new WSKey(config.wskey.public, config.wskey.secret, {user: config.user
   , errMode = !!(argv['e'] || argv['err'])
   , quiet = !!(argv['q'] || argv['quiet'])
   , time = argv['t'] || argv['time'] || 2500
-  , record
   ;
 
 if ( argv['h'] || argv['help'] ) {
@@ -101,7 +100,7 @@ function showHelp() {
   console.log('--check-in | --check-out | --debug   set mode');
   console.log('--time=<interval> | -t <interval>    frequency of transaction in ms (default is 2500)');
   console.log('--config=<path>                      set path to config.json file');
-  console.log('-q                                   quiet mode (no feedback)');
-  console.log('-e                                   only displays errors');
+  console.log('--quiet | -q                         quiet mode (no transactional feedback)');
+  console.log('--err | -e                           only display transactional errors');
   console.log('--help | -h                          display this menu');
 }
