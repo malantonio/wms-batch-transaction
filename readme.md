@@ -9,8 +9,8 @@ those items out in WMS.
 1. Install 
 
 ```bash
-git clone https://github.com/malantonio/oclc-migration-script
-cd oclc-migration-script
+git clone https://github.com/malantonio/wms-batch-transaction
+cd wms-batch-transaction
 ```
 
 2. Prep a .csv file, without headers, with three columns:
