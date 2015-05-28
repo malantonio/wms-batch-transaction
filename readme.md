@@ -16,7 +16,7 @@ cd oclc-migration-script
 2. Prep a .csv file, without headers, with three columns:
 
 ```
-<item barcode>,<patron barcode>,<due date>
+<patron barcode>,<item barcode>,<due date>
 ```
 
 (Due date column is optional)
