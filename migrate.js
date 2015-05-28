@@ -50,8 +50,8 @@ fs.readFile(file, function(err, data) {
       i++;
       if ( i === len ) return clearInterval(interv);
       var record = d[i]
-        , item = record[0]
-        , patron = record[1]
+        , patron = record[0]
+        , item = record[1]
         , dueDate = record[2]
         , line = i + 1
         ;
