@@ -63,8 +63,6 @@ fs.readFile(file, function(err, data) {
         patron = patron.replace(/"/g, '');
       }
 
-      while ( patron.length < 10 ) { patron = '0' + patron; }
-
       if ( !item ) return console.warn('[LINE %d, ERR] - No item barcode', line);
       if ( !patron && !checkIn ) return console.warn('[LINE %d, ERR] - No item barcode');
 
