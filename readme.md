@@ -9,7 +9,7 @@ those items out in WMS.
 1. Install 
 
 ```bash
-git clone https://github.com/TrexlerLibrary/oclc-migration-script
+git clone https://github.com/malantonio/oclc-migration-script
 cd oclc-migration-script
 ```
 
