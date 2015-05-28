@@ -76,7 +76,7 @@ fs.readFile(file, function(err, data) {
         return ncip.checkInItem(config.shelvingLoc, item, function(err, resp) {
           if ( !quiet ) {
             if (err) return console.warn('[LINE %d, CHECK-IN ERR] %s', line, err.detail ? err.detail : err );
-            else return errMode ? true : console.log('[LINE %d, OK]');
+            else return errMode ? true : console.log('[LINE %d, OK]', line);
           }
         });
       } else {
