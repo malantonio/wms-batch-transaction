@@ -7,6 +7,7 @@ var fs = require('fs')
   , NCIP = require('oclc-ncip')
   , parse = require('csv-parse')
   , argv = require('minimist')(process.argv.slice(2), {'boolean': true})
+  , clc = require('cli-color')
   ;
 
 var configPath = argv['config'] || path.join(__dirname, 'config.json');
@@ -54,6 +55,7 @@ fs.readFile(file, function(err, data) {
         , item = record[1]
         , dueDate = record[2]
         , line = i + 1
+        , itemErr = false
         ;
 
 
@@ -63,25 +65,48 @@ fs.readFile(file, function(err, data) {
         patron = patron.replace(/"/g, '');
       }
 
-      if ( !item ) return console.warn('[LINE %d, ERR] - No item barcode', line);
-      if ( !patron && !checkIn ) return console.warn('[LINE %d, ERR] - No item barcode');
+      if ( !item ) return console.warn(clc.red('[LINE %d, ERR]') + ' - No item barcode', line);
+      if ( !patron && !checkIn ) return console.warn(clc.red('[LINE %d, ERR]') + ' - No patron barcode');
 
       if ( debug ) {
-        return console.log('[LINE %d, DEBUG] patron: %s, item: %s, due date: %s', line, patron, item, dueDate);
+        return console.log(
+          clc.cyan('[LINE %d, DEBUG]') + ' patron: %s, item: %s'
+            + (dueDate ? ', due date: %s' : ''), 
+          line, 
+          patron, 
+          item, 
+          (dueDate ? dueDate : '')
+        );
       }
 
       if ( checkIn ) {
         return ncip.checkInItem(config.shelvingLoc, item, function(err, resp) {
           if ( !quiet ) {
-            if (err) return console.warn('[LINE %d, CHECK-IN ERR] %s', line, err.detail ? err.detail : err );
-            else return errMode ? true : console.log('[LINE %d, OK]', line);
+            if (err) {
+              if ( err.detail && err.detail.match(/item/i) ) itemErr = true;
+              return console.warn(
+                      clc.redBright('[LINE %d, CHECK-IN ERR]') + ' %s: ' + ' %s', 
+                      line, 
+                      itemErr ? item : patron, 
+                      err.detail ? err.detail : err
+              );
+            }
+            else return errMode ? true : console.log(clc.greenBright('[LINE %d, OK]'), line);
           }
         });
       } else {
         return ncip.checkOutItem(config.shelvingLoc, item, patron, function(err, resp) {
           if ( !quiet ) {
-            if (err) return console.warn('[LINE %d, CHECK-OUT ERR] %s', line, err.detail ? err.detail : err);
-            else return errMode ? true : console.log('[LINE %d, CHECK-OUT OK]', line)
+            if (err) {
+              if ( err.detail && err.detail.match(/item/i) ) itemErr = true;
+              return console.warn(
+                      clc.redBright('[LINE %d, CHECK-OUT ERR]') + ' %s: %s', 
+                      line, 
+                      itemErr ? item : patron, 
+                      err.detail ? err.detail : err
+              );
+            }
+            else return errMode ? true : console.log(clc.greenBright('[LINE %d, CHECK-OUT OK]'), line)
           }
         });
       }
