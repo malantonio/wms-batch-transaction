@@ -50,7 +50,7 @@ node migrate <flags> data.csv
 
          flag            | value
 -------------------------|--------
-`--time=<ms> | -t <ms>`  | sets the time between transactions (default is 2500ms. anything lower than 500 isn't recommended)
+`--time=<ms> | -t <ms>`  | sets the time between transactions (default is 2500ms. anything lower than 100 isn't recommended)
 `--config=<path>`        | set a custom path to a `config.json` file
 `--quiet | -q`           | set to quiet mode (only logs csv errors)
 `--err | -e`             | only displays transactional errors (OK messages ignored)
