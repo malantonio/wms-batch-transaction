@@ -1,35 +1,49 @@
 'use strict';
 
-var fs = require('fs')
-  , path = require('path')
-  , config = require('./config.json')
-  , WSKey = require('oclc-wskey')
-  , NCIP = require('oclc-ncip')
-  , parse = require('csv-parse')
-  , argv = require('minimist')(process.argv.slice(2), {'boolean': true})
-  , clc
+// parse opts first
+var argv = require('minimist')(process.argv.slice(2), {'boolean': true})
+  // modes
+  , checkIn = argv['check-in']
+  , checkOut = argv['check-out']
+  , debug = argv['debug']
+  
+  // flags
+  // --no-color registers in minimist as {color: false}
+  , colorMode = argv['color'] !== undefined ? argv['color'] : true
+  , errMode = !!(argv['e'] || argv['err'])
+  , quiet = !!(argv['q'] || argv['quiet'])
+  , time = argv['t'] || argv['time'] || 250
   ;
 
-var configPath = argv['config'] || path.join(__dirname, 'config.json');
+// before loading everything, let's check for help + errors
+if ( argv['h'] || argv['help'] ) return showHelp();
+if ( !argv._.length ) return console.warn('Error: No file provided!');
+if ( checkIn && checkOut ) return console.warn('Use only --check-in or --check-out, not both!');
+if ( !checkIn && !checkOut && !debug) return console.warn('Must choose: --check-in, --check-out, or --debug!');
+
+// check for config file
+var fs = require('fs')
+  , path = require('path')
+  , configPath = argv['config'] || path.join(__dirname, 'config.json')
+  , config = require(configPath)
+  ;
 
 if ( !fs.statSync(configPath).isFile() ) return console.warn('No config.json file found');
 
-var key = new WSKey(config.wskey.public, config.wskey.secret, {user: config.user})
+// set up our guts
+var WSKey = require('oclc-wskey')
+  , NCIP = require('oclc-ncip')
+  , parse = require('csv-parse')
+  , key = new WSKey(config.wskey.public, config.wskey.secret, {user: config.user})
   , ncip = new NCIP(config.agencyID, key)
   , file = argv._[0]
   , parser = parse()
-  , checkIn = !!(argv['check-in'])
-  , checkOut = !!(argv['check-out'])
-  , colorMode = argv['color'] !== undefined ? argv['color'] : true
-  , debug = !!argv['debug']
-  , errMode = !!(argv['e'] || argv['err'])
-  , quiet = !!(argv['q'] || argv['quiet'])
-  , time = argv['t'] || argv['time'] || 2500
+  , clc
   ;
 
-if ( colorMode ) {
-  clc = require('cli-color');
-} else {
+// set up colorMode business
+if ( colorMode ) clc = require('cli-color');
+else {
   clc = {};
   
   clc['cyan'] = 
@@ -38,18 +52,7 @@ if ( colorMode ) {
     function(t){return t;}
 }
 
-if ( argv['h'] || argv['help'] ) {
-  return showHelp();
-}
-
-if ( checkIn && checkOut ) {
-  return console.warn('Use only --check-in or --check-out, not both!');
-}
-
-if ( !checkIn && !checkOut && !debug) {
-  return console.warn('Must choose: --check-in, --check-out, or --debug!');
-}
-
+// time to make the :donut:s
 fs.readFile(file, function(err, data) {
   if (err) throw err;
 
@@ -81,7 +84,7 @@ fs.readFile(file, function(err, data) {
       if ( !patron && !checkIn ) return console.warn(clc.redBright('[LINE %d, ERR]') + ' - No patron barcode');
 
       if ( debug ) {
-        return console.log(
+        return quiet ? true : console.log(
           clc.cyan('[LINE %d, DEBUG]') + ' patron: %s, item: %s'
             + (dueDate ? ', due date: %s' : ''), 
           line, 
@@ -127,16 +130,19 @@ fs.readFile(file, function(err, data) {
 })
 
 function showHelp() {
-  var name = path.basename(process.argv[1]);
+  var path = path || require('path')
+    , name = path.basename(process.argv[1])
+    ;
+
   console.log('Batch check in/out items in WMS');
   console.log('Usage: node %s [opt] path/to/file.csv', name);
   console.log('')
   console.log('OPTIONS');
-  console.log('--check-in | --check-out | --debug   set mode');
-  console.log('--time=<interval> | -t <interval>    frequency of transaction in ms (default is 2500)');
-  console.log('--config=<path>                      set path to config.json file');
-  console.log('--quiet | -q                         quiet mode (no transactional feedback)');
-  console.log('--err | -e                           only display transactional errors');
-  console.log('--no-color                           disable color output');
-  console.log('--help | -h                          display this menu');
+  console.log('    --check-in | --check-out | --debug   set mode');
+  console.log('    --time=<interval> | -t <interval>    frequency of transaction in ms (default is 250)');
+  console.log('    --config=<path>                      set path to config.json file');
+  console.log('    --quiet | -q                         quiet mode (no transactional feedback)');
+  console.log('    --err | -e                           only display transactional errors');
+  console.log('    --no-color                           disable color output');
+  console.log('    --help | -h                          display this menu');
 }
