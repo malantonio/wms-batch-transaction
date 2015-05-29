@@ -7,7 +7,7 @@ var fs = require('fs')
   , NCIP = require('oclc-ncip')
   , parse = require('csv-parse')
   , argv = require('minimist')(process.argv.slice(2), {'boolean': true})
-  , clc = require('cli-color')
+  , clc
   ;
 
 var configPath = argv['config'] || path.join(__dirname, 'config.json');
@@ -20,11 +20,23 @@ var key = new WSKey(config.wskey.public, config.wskey.secret, {user: config.user
   , parser = parse()
   , checkIn = !!(argv['check-in'])
   , checkOut = !!(argv['check-out'])
+  , colorMode = argv['color'] !== undefined ? argv['color'] : true
   , debug = !!argv['debug']
   , errMode = !!(argv['e'] || argv['err'])
   , quiet = !!(argv['q'] || argv['quiet'])
   , time = argv['t'] || argv['time'] || 2500
   ;
+
+if ( colorMode ) {
+  clc = require('cli-color');
+} else {
+  clc = {};
+  
+  clc['cyan'] = 
+  clc['redBright'] =
+  clc['greenBright'] = 
+    function(t){return t;}
+}
 
 if ( argv['h'] || argv['help'] ) {
   return showHelp();
@@ -65,8 +77,8 @@ fs.readFile(file, function(err, data) {
         patron = patron.replace(/"/g, '');
       }
 
-      if ( !item ) return console.warn(clc.red('[LINE %d, ERR]') + ' - No item barcode', line);
-      if ( !patron && !checkIn ) return console.warn(clc.red('[LINE %d, ERR]') + ' - No patron barcode');
+      if ( !item ) return console.warn(clc.redBright('[LINE %d, ERR]') + ' - No item barcode', line);
+      if ( !patron && !checkIn ) return console.warn(clc.redBright('[LINE %d, ERR]') + ' - No patron barcode');
 
       if ( debug ) {
         return console.log(
@@ -125,5 +137,6 @@ function showHelp() {
   console.log('--config=<path>                      set path to config.json file');
   console.log('--quiet | -q                         quiet mode (no transactional feedback)');
   console.log('--err | -e                           only display transactional errors');
+  console.log('--no-color                           disable color output');
   console.log('--help | -h                          display this menu');
 }

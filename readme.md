@@ -54,4 +54,5 @@ node migrate <flags> data.csv
 `--config=<path>`        | set a custom path to a `config.json` file
 `--quiet | -q`           | set to quiet mode (only logs csv errors)
 `--err | -e`             | only displays transactional errors (OK messages ignored)
+`--no-color`             | disables color output
 `--help | -h`            | display the help menu
